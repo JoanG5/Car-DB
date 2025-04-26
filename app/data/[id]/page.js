@@ -6,13 +6,55 @@ import { useEffect, useState } from "react";
 import { db } from "@/firebase/config";
 
 import Box from "@mui/material/Box";
-import { Button, TextField } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Input,
+  InputLabel,
+  List,
+  ListItem,
+  ListItemText,
+  TextField,
+} from "@mui/material";
 
 export default function Page({ params }) {
   const userId = "E7a0wWKwmJ6AOGvAJAXd"; // TEMP user ID, replace with actual user ID logic
   const unwrappedParams = React.use(params);
   const carId = unwrappedParams.id;
+
+  const values = [
+    "marca",
+    "modelo",
+    "año",
+    "color",
+    "chasis",
+    "precio",
+    "millas",
+    "dealer",
+    "transporte",
+    "varco",
+    "placa",
+    "impuesto",
+  ];
+
   const [car, setCar] = useState(null);
+  const [updateCar, setUpdateCar] = useState({
+    marca: "",
+    modelo: "",
+    año: "",
+    color: "",
+    chasis: "",
+    precio: "",
+    millas: "",
+    dealer: "",
+    transporte: "",
+    varco: "",
+    placa: "",
+    impuesto: "",
+    gastos: [],
+  });
+  console.log(updateCar);
 
   useEffect(() => {
     fetchCar(userId, carId);
@@ -48,6 +90,7 @@ export default function Page({ params }) {
             <Box component="h1" sx={{ fontSize: "2rem", marginBottom: "20px" }}>
               Car Details
             </Box>
+
             <Box
               sx={{
                 display: "grid",
@@ -56,44 +99,116 @@ export default function Page({ params }) {
                 textAlign: "left",
               }}
             >
-              <TextField label="Marca" value={car.marca || ""} fullWidth />
-              <TextField label="Modelo" value={car.modelo || ""} fullWidth />
-              <TextField label="Año" value={car.año || ""} fullWidth />
-              <TextField label="Color" value={car.color || ""} fullWidth />
-              <TextField label="Chasis" value={car.chasis || ""} fullWidth />
-              <TextField
-                label="Precio"
-                value={`$${car.precio || ""}`}
-                fullWidth
-              />
-              <TextField label="Millas" value={car.millas || ""} fullWidth />
-              <TextField label="Dealer" value={car.dealer || ""} fullWidth />
-              <TextField
-                label="Transporte"
-                value={car.transporte || ""}
-                fullWidth
-              />
-              <TextField label="Varco" value={car.varco || ""} fullWidth />
-              <TextField label="Placa" value={car.placa || ""} fullWidth />
-              <TextField
-                label="Impuesto"
-                value={`$${car.impuesto || ""}`}
-                fullWidth
-              />
+              {values.map((value) => (
+                <Box>
+                  <Box sx={{ marginBottom: "10px" }}>
+                    <Box
+                      component="span"
+                      sx={{ fontWeight: "bold", marginRight: "10px" }}
+                    >
+                      {value.charAt(0).toUpperCase() + value.slice(1)}:
+                    </Box>
+                    <Box component="span">{car[value] || "N/A"}</Box>
+                  </Box>
+                  <TextField
+                    label={`Update ${
+                      value.charAt(0).toUpperCase() + value.slice(1)
+                    }`}
+                    fullWidth
+                    onChange={(e) =>
+                      setUpdateCar((prev) => ({
+                        ...prev,
+                        [value]: e.target.value,
+                      }))
+                    }
+                  />
+                </Box>
+              ))}
             </Box>
             <Box component="h2" sx={{ fontSize: "1.5rem", marginTop: "30px" }}>
               Gastos
             </Box>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <Box>
+                <Box
+                  component="span"
+                  sx={{ fontWeight: "bold", marginRight: "10px" }}
+                >
+                  Gasto:
+                </Box>
+                <TextField label="Update Gasto" fullWidth></TextField>
+              </Box>
+
+              <Box>
+                <Box
+                  component="span"
+                  sx={{ fontWeight: "bold", marginRight: "10px" }}
+                >
+                  Precio:
+                </Box>
+                <TextField label="Update Gasto" fullWidth></TextField>
+              </Box>
+              <Box>
+                <Button
+                  color="primary"
+                  variant="contained"
+                  onClick={() => console.log(`Delete gasto ${index}`)}
+                  sx={{ marginLeft: "10px" }}
+                >
+                  Add Gasto
+                </Button>
+              </Box>
+            </Box>
             <Box component="ul" sx={{ listStyleType: "none", padding: 0 }}>
               {car.gastos && car.gastos.length > 0 ? (
                 car.gastos.map((gasto, index) => (
-                  <TextField
+                  <Box
                     key={index}
-                    label={gasto.tipo}
-                    value={`$${gasto.precio}`}
-                    fullWidth
-                    sx={{ marginBottom: "10px" }}
-                  />
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "1fr 1fr 1fr",
+                      alignItems: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <Box>
+                      <Box
+                        component="span"
+                        sx={{ fontWeight: "bold", marginRight: "10px" }}
+                      >
+                        Gasto {index + 1}:
+                      </Box>
+                      <Box component="span">{gasto.tipo || "N/A"}</Box>
+                      <TextField label="Update Gasto" fullWidth></TextField>
+                    </Box>
+                    <Box>
+                      <Box
+                        component="span"
+                        sx={{ fontWeight: "bold", marginRight: "10px" }}
+                      >
+                        Precio:
+                      </Box>
+                      <Box component="span">{gasto.precio || "N/A"}</Box>
+                      <TextField label="Update Gasto" fullWidth></TextField>
+                    </Box>
+                    <Box>
+                      <Button
+                        color="error"
+                        variant="contained"
+                        onClick={() => console.log(`Delete gasto ${index}`)}
+                        sx={{ marginLeft: "10px" }}
+                      >
+                        Delete
+                      </Button>
+                    </Box>
+                  </Box>
                 ))
               ) : (
                 <Box sx={{ fontSize: "1.2rem" }}>
