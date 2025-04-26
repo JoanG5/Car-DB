@@ -21,7 +21,7 @@ export default function Home() {
   const userId = "E7a0wWKwmJ6AOGvAJAXd"; // TEMP user ID, replace with actual user ID logic
 
   const [cars, setCars] = React.useState([]);
-  const [filteredData, setFilteredData] = React.useState(metadata);
+  const [filteredData, setFilteredData] = React.useState([]);
   const [make, setMake] = React.useState("");
   const [model, setModel] = React.useState("");
   const [year, setYear] = React.useState("");
@@ -46,6 +46,7 @@ export default function Home() {
       }));
 
       setCars(carsData);
+      setFilteredData(carsData);
     } catch (error) {
       console.error("Error fetching cars:", error);
     }
@@ -53,7 +54,7 @@ export default function Home() {
 
   const searchData = (make, model, year) => {
     setFilteredData(
-      metadata.filter(
+      cars.filter(
         (item) =>
           (make ? item.make === make : true) &&
           (model ? item.model === model : true) &&
@@ -88,7 +89,7 @@ export default function Home() {
       >
         <Autocomplete
           disablePortal
-          options={[...new Set(metadata.map((option) => option.make))]}
+          options={[...new Set(cars.map((option) => option.marca))]}
           sx={{ width: 300 }}
           renderInput={(params) => <TextField {...params} label="Make" />}
           onChange={(event, value) => {
@@ -97,7 +98,7 @@ export default function Home() {
         />
         <Autocomplete
           disablePortal
-          options={[...new Set(metadata.map((option) => option.model))]}
+          options={[...new Set(cars.map((option) => option.modelo))]}
           sx={{ width: 300 }}
           renderInput={(params) => <TextField {...params} label="Model" />}
           onChange={(event, value) => {
@@ -106,9 +107,7 @@ export default function Home() {
         />
         <Autocomplete
           disablePortal
-          options={[
-            ...new Set(metadata.map((option) => option.year.toString())),
-          ]}
+          options={[...new Set(cars.map((option) => option.año.toString()))]}
           sx={{ width: 300 }}
           renderInput={(params) => <TextField {...params} label="Year" />}
           onChange={(event, value) => {
@@ -206,21 +205,26 @@ export default function Home() {
             </TableHead>
             <TableBody>
               {filteredData.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  hover
+                  onClick={() => (window.location.href = `/data/${row.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
                   <TableCell component="th" scope="row">
-                    {row.make}
+                    {row.marca}
                   </TableCell>
-                  <TableCell align="right">{row.model}</TableCell>
-                  <TableCell align="right">{row.year}</TableCell>
+                  <TableCell align="right">{row.modelo}</TableCell>
+                  <TableCell align="right">{row.año}</TableCell>
                   <TableCell align="right">{row.color}</TableCell>
-                  <TableCell align="right">{row.chassis}</TableCell>
-                  <TableCell align="right">{row.price}</TableCell>
-                  <TableCell align="right">{row.miles}</TableCell>
+                  <TableCell align="right">{row.chasis}</TableCell>
+                  <TableCell align="right">{row.precio}</TableCell>
+                  <TableCell align="right">{row.millas}</TableCell>
                   <TableCell align="right">{row.dealer}</TableCell>
-                  <TableCell align="right">{row.transport}</TableCell>
-                  <TableCell align="right">{row.vessel}</TableCell>
-                  <TableCell align="right">{row.plate}</TableCell>
-                  <TableCell align="right">{row.tax}</TableCell>
+                  <TableCell align="right">{row.transporte}</TableCell>
+                  <TableCell align="right">{row.varco}</TableCell>
+                  <TableCell align="right">{row.placa}</TableCell>
+                  <TableCell align="right">{row.impuesto}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
