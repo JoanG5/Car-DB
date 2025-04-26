@@ -3,18 +3,37 @@
 import * as React from "react";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
-import FormHelperText from "@mui/joy/FormHelperText";
 import Input from "@mui/joy/Input";
 import { Button } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useState } from "react";
+import { db } from "@/firebase/config"; // Adjust the import path as necessary
+import { addDoc, collection } from "firebase/firestore"; // Import Firestore functions
 
 export default function InputField() {
+  const userId = "E7a0wWKwmJ6AOGvAJAXd"; // TEMP user ID, replace with actual user ID logic
+  const [car, setCar] = useState({
+    marca: "",
+    modelo: "",
+    año: "",
+    color: "",
+    chasis: "",
+    precio: "",
+    millas: "",
+    dealer: "",
+    transporte: "",
+    varco: "",
+    placa: "",
+    impuesto: "",
+  });
   const [gasto, setGasto] = useState({
     tipo: "",
     precio: "",
   });
   const [listGastos, setListGastos] = useState([]);
+
+  // console.log("Current car state:", car);
+  // console.log("Current gasto state:", gasto);
 
   const addGasto = (gasto) => {
     if (!gasto.tipo || !gasto.precio) {
@@ -24,6 +43,47 @@ export default function InputField() {
     setListGastos((prev) => [...prev, gasto]);
     setGasto({ tipo: "", precio: "" });
     console.log(listGastos);
+  };
+
+  const deleteGasto = (index) => {
+    setListGastos((prev) => prev.filter((_, i) => i !== index));
+    console.log("Gasto deleted at index:", index);
+  };
+
+  const addCar = async (e) => {
+    e.preventDefault();
+    for (const key in car) {
+      if (!car[key]) {
+        alert(`Please fill in the ${key} field`);
+        return;
+      }
+    }
+    const newCar = {
+      ...car,
+      gastos: listGastos,
+    };
+    await addDoc(collection(db, "users", userId, "cars"), newCar)
+      .then(() => {
+        console.log("Car added successfully:", newCar);
+        setCar({
+          marca: "",
+          modelo: "",
+          año: "",
+          color: "",
+          chasis: "",
+          precio: "",
+          millas: "",
+          dealer: "",
+          transporte: "",
+          varco: "",
+          placa: "",
+          impuesto: "",
+        });
+        setListGastos([]);
+      })
+      .catch((error) => {
+        console.error("Error adding car:", error);
+      });
   };
 
   return (
@@ -47,15 +107,34 @@ export default function InputField() {
         >
           <FormControl>
             <FormLabel>Marca</FormLabel>
-            <Input placeholder="Marca" />
+            <Input
+              placeholder="Marca"
+              value={car.marca}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, marca: e.target.value }))
+              }
+            />
           </FormControl>
           <FormControl>
             <FormLabel>Modelo</FormLabel>
-            <Input placeholder="Modelo" />
+            <Input
+              placeholder="Modelo"
+              value={car.modelo}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, modelo: e.target.value }))
+              }
+            />
           </FormControl>
           <FormControl>
             <FormLabel>Año</FormLabel>
-            <Input type="number" placeholder="Año" />
+            <Input
+              type="number"
+              placeholder="Año"
+              value={car.año}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, año: e.target.value }))
+              }
+            />
           </FormControl>
         </Box>
         <Box
@@ -68,15 +147,34 @@ export default function InputField() {
         >
           <FormControl>
             <FormLabel>Color</FormLabel>
-            <Input placeholder="Color" />
+            <Input
+              placeholder="Color"
+              value={car.color}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, color: e.target.value }))
+              }
+            />
           </FormControl>
           <FormControl>
             <FormLabel>Chasis</FormLabel>
-            <Input placeholder="Chasis" />
+            <Input
+              placeholder="Chasis"
+              value={car.chasis}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, chasis: e.target.value }))
+              }
+            />
           </FormControl>
           <FormControl>
             <FormLabel>Precio</FormLabel>
-            <Input type="number" placeholder="Precio" />
+            <Input
+              type="number"
+              placeholder="Precio"
+              value={car.precio}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, precio: e.target.value }))
+              }
+            />
           </FormControl>
         </Box>
 
@@ -90,15 +188,34 @@ export default function InputField() {
         >
           <FormControl>
             <FormLabel>Millas</FormLabel>
-            <Input placeholder="Millas" />
+            <Input
+              placeholder="Millas"
+              type="number"
+              value={car.millas}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, millas: e.target.value }))
+              }
+            />
           </FormControl>
           <FormControl>
             <FormLabel>Dealer</FormLabel>
-            <Input placeholder="Dealer" />
+            <Input
+              placeholder="Dealer"
+              value={car.dealer}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, dealer: e.target.value }))
+              }
+            />
           </FormControl>
           <FormControl>
             <FormLabel>Transporte</FormLabel>
-            <Input type="number" placeholder="Transporte" />
+            <Input
+              placeholder="Transporte"
+              value={car.transporte}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, transporte: e.target.value }))
+              }
+            />
           </FormControl>
         </Box>
 
@@ -112,22 +229,40 @@ export default function InputField() {
         >
           <FormControl>
             <FormLabel>Varco</FormLabel>
-            <Input placeholder="Varco" />
+            <Input
+              placeholder="Varco"
+              value={car.varco}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, varco: e.target.value }))
+              }
+            />
           </FormControl>
           <FormControl>
             <FormLabel>Placa</FormLabel>
-            <Input placeholder="Modelo" />
+            <Input
+              placeholder="Modelo"
+              value={car.placa}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, placa: e.target.value }))
+              }
+            />
           </FormControl>
           <FormControl>
             <FormLabel>Impuesto</FormLabel>
-            <Input type="number" placeholder="Año" />
+            <Input
+              type="number"
+              placeholder="Impuesto"
+              value={car.impuesto}
+              onChange={(e) =>
+                setCar((prev) => ({ ...prev, impuesto: e.target.value }))
+              }
+            />
           </FormControl>
         </Box>
 
         <Box
           style={{
             display: "flex",
-            flexDirection: "row", // Changed to row
             gap: "20px",
             marginBottom: "20px",
           }}
@@ -137,6 +272,7 @@ export default function InputField() {
             <Input
               placeholder="Tipo De Gasto"
               fullWidth
+              value={gasto.tipo}
               onChange={(e) =>
                 setGasto((prev) => ({ ...prev, tipo: e.target.value }))
               }
@@ -148,6 +284,7 @@ export default function InputField() {
               placeholder="Gasto"
               type="number"
               fullWidth
+              value={gasto.precio}
               onChange={(e) =>
                 setGasto((prev) => ({ ...prev, precio: e.target.value }))
               }
@@ -157,7 +294,9 @@ export default function InputField() {
             variant="contained"
             color="primary"
             style={{ marginTop: "20px" }}
-            onClick={() => addGasto(gasto)}
+            onClick={() => {
+              addGasto(gasto);
+            }}
           >
             Add
           </Button>
@@ -186,7 +325,7 @@ export default function InputField() {
             <Button
               variant="contained"
               color="error"
-              onClick={() => addGasto(gasto)}
+              onClick={() => deleteGasto(index)}
             >
               Delete
             </Button>
@@ -197,6 +336,7 @@ export default function InputField() {
           variant="contained"
           color="primary"
           style={{ marginTop: "20px" }}
+          onClick={addCar} // Call addCar function on click
         >
           Submit
         </Button>

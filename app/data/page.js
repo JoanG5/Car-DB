@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -7,28 +9,117 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import { Button } from "@mui/material";
 
-const metadata = [
-  { id: 1, make: "Toyota", model: "Corolla", year: 2020 },
-  { id: 2, make: "Honda", model: "Civic", year: 2019 },
-  { id: 3, make: "Ford", model: "Mustang", year: 2021 },
-  { id: 4, make: "Chevrolet", model: "Camaro", year: 2018 },
-  { id: 5, make: "Nissan", model: "Altima", year: 2022 },
-  { id: 6, make: "BMW", model: "3 Series", year: 2020 },
-  { id: 7, make: "Mercedes-Benz", model: "C-Class", year: 2021 },
-  { id: 8, make: "Audi", model: "A4", year: 2019 },
-  { id: 9, make: "Volkswagen", model: "Passat", year: 2020 },
-  { id: 10, make: "Hyundai", model: "Elantra", year: 2021 },
-  { id: 11, make: "Kia", model: "Optima", year: 2018 },
-  { id: 12, make: "Subaru", model: "Impreza", year: 2022 },
-  { id: 13, make: "Mazda", model: "Mazda3", year: 2020 },
-  { id: 14, make: "Tesla", model: "Model 3", year: 2021 },
-  { id: 15, make: "Volvo", model: "S60", year: 2019 },
-];
+import metadata from "../../metadata.json";
+import { db } from "@/firebase/config";
+import { collection, getDocs, query } from "firebase/firestore";
 
 export default function Home() {
+  const userId = "E7a0wWKwmJ6AOGvAJAXd"; // TEMP user ID, replace with actual user ID logic
+
+  const [cars, setCars] = React.useState([]);
+  const [filteredData, setFilteredData] = React.useState(metadata);
+  const [make, setMake] = React.useState("");
+  const [model, setModel] = React.useState("");
+  const [year, setYear] = React.useState("");
+
+  React.useEffect(() => {
+    fetchCars();
+    searchData(make, model, year);
+  }, [make, model, year]);
+
+  const fetchCars = async () => {
+    try {
+      // const auth = getAuth();
+      // const userId = auth.currentUser?.uid;
+      // if (!userId) return;
+
+      const carsQuery = query(collection(db, "users", userId, "cars"));
+      const snapshot = await getDocs(carsQuery);
+
+      const carsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setCars(carsData);
+    } catch (error) {
+      console.error("Error fetching cars:", error);
+    }
+  };
+
+  const searchData = (make, model, year) => {
+    setFilteredData(
+      metadata.filter(
+        (item) =>
+          (make ? item.make === make : true) &&
+          (model ? item.model === model : true) &&
+          (year ? item.year.toString() === year : true)
+      )
+    );
+    console.log(filteredData);
+  };
+
+  // if (cars.length === 0 || filteredData.length === 0) {
+  //   return (
+  //     <div>
+  //       <h1>No cars found</h1>
+  //       <p>Please add a car to see the data.</p>
+  //     </div>
+  //   );
+  // }
+
+  // console.log("Filtered Data:", filteredData);
+  console.log("Cars:", cars);
+
   return (
     <div>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: "10px",
+          marginBottom: "20px",
+          margin: "20px", // Added margin
+        }}
+      >
+        <Autocomplete
+          disablePortal
+          options={[...new Set(metadata.map((option) => option.make))]}
+          sx={{ width: 300 }}
+          renderInput={(params) => <TextField {...params} label="Make" />}
+          onChange={(event, value) => {
+            setMake(value);
+          }}
+        />
+        <Autocomplete
+          disablePortal
+          options={[...new Set(metadata.map((option) => option.model))]}
+          sx={{ width: 300 }}
+          renderInput={(params) => <TextField {...params} label="Model" />}
+          onChange={(event, value) => {
+            setModel(value);
+          }}
+        />
+        <Autocomplete
+          disablePortal
+          options={[
+            ...new Set(metadata.map((option) => option.year.toString())),
+          ]}
+          sx={{ width: 300 }}
+          renderInput={(params) => <TextField {...params} label="Year" />}
+          onChange={(event, value) => {
+            setYear(value);
+          }}
+        />
+        <Button color="primary" onClick={() => searchData(make, model, year)}>
+          Search
+        </Button>
+      </Box>
+
       <Box
         sx={{
           backgroundColor: "#f5f5f5",
@@ -43,30 +134,93 @@ export default function Home() {
             <TableHead>
               <TableRow style={{ backgroundColor: "#f5f5f5" }}>
                 <TableCell style={{ fontWeight: "bold", fontSize: "16px" }}>
-                  Make
+                  Marca
                 </TableCell>
                 <TableCell
                   style={{ fontWeight: "bold", fontSize: "16px" }}
                   align="right"
                 >
-                  Model
+                  Modelo
                 </TableCell>
                 <TableCell
                   style={{ fontWeight: "bold", fontSize: "16px" }}
                   align="right"
                 >
-                  Year
+                  Año
+                </TableCell>
+                <TableCell
+                  style={{ fontWeight: "bold", fontSize: "16px" }}
+                  align="right"
+                >
+                  Color
+                </TableCell>
+                <TableCell
+                  style={{ fontWeight: "bold", fontSize: "16px" }}
+                  align="right"
+                >
+                  Chasis
+                </TableCell>
+                <TableCell
+                  style={{ fontWeight: "bold", fontSize: "16px" }}
+                  align="right"
+                >
+                  Precio
+                </TableCell>
+                <TableCell
+                  style={{ fontWeight: "bold", fontSize: "16px" }}
+                  align="right"
+                >
+                  Millas
+                </TableCell>
+                <TableCell
+                  style={{ fontWeight: "bold", fontSize: "16px" }}
+                  align="right"
+                >
+                  Dealer
+                </TableCell>
+                <TableCell
+                  style={{ fontWeight: "bold", fontSize: "16px" }}
+                  align="right"
+                >
+                  Transporte
+                </TableCell>
+                <TableCell
+                  style={{ fontWeight: "bold", fontSize: "16px" }}
+                  align="right"
+                >
+                  Varco
+                </TableCell>
+                <TableCell
+                  style={{ fontWeight: "bold", fontSize: "16px" }}
+                  align="right"
+                >
+                  Placa
+                </TableCell>
+                <TableCell
+                  style={{ fontWeight: "bold", fontSize: "16px" }}
+                  align="right"
+                >
+                  Impuesto
                 </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {metadata.map((row) => (
+              {filteredData.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell component="th" scope="row">
                     {row.make}
                   </TableCell>
                   <TableCell align="right">{row.model}</TableCell>
                   <TableCell align="right">{row.year}</TableCell>
+                  <TableCell align="right">{row.color}</TableCell>
+                  <TableCell align="right">{row.chassis}</TableCell>
+                  <TableCell align="right">{row.price}</TableCell>
+                  <TableCell align="right">{row.miles}</TableCell>
+                  <TableCell align="right">{row.dealer}</TableCell>
+                  <TableCell align="right">{row.transport}</TableCell>
+                  <TableCell align="right">{row.vessel}</TableCell>
+                  <TableCell align="right">{row.plate}</TableCell>
+                  <TableCell align="right">{row.tax}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
